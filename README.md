@@ -5,5 +5,5 @@
 ### Install core dependencies
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/bootstrap/homebrew.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/bootstrap/install.sh)"
 ```
