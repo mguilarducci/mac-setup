@@ -42,3 +42,8 @@ if confirm "Add Homebrew to your shell environment ($ZPROFILE)?"; then
 else
   echo "Skipped shell configuration."
 fi
+
+if [ -f "$ZPROFILE" ]; then
+  # shellcheck disable=SC1090
+  source "$ZPROFILE"
+fi
