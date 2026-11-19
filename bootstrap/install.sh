@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Installs the core tools in order: Homebrew, then the GitHub CLI.
+# Installs the core tools in order: Homebrew, the GitHub CLI, then hc.
 #
 # Works from a local clone or piped from curl. When piped, it downloads
 # the repository to a temporary directory first.
@@ -26,3 +26,5 @@ if ! command -v brew > /dev/null && [ -x /opt/homebrew/bin/brew ]; then
 fi
 
 bash "$ROOT_DIR/tools/core/gh/install.sh"
+
+bash "$ROOT_DIR/tools/core/hc/install.sh"
