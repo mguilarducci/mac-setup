@@ -9,6 +9,11 @@
 
 set -euo pipefail
 
+# Some tools install into ~/.local/bin, which is not on the PATH by default.
+grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.zprofile 2> /dev/null ||
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+export PATH="$HOME/.local/bin:$PATH"
+
 REPO_TARBALL="https://github.com/mguilarducci/mac-setup/archive/HEAD.tar.gz"
 BREW_BIN="/opt/homebrew/bin/brew"
 
