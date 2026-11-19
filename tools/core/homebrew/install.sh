@@ -8,6 +8,7 @@ set -euo pipefail
 INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 BREW_BIN="/opt/homebrew/bin/brew"
 ZPROFILE="$HOME/.zprofile"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Ask a [Y/n] question. Returns 0 for yes (default), 1 for no.
 confirm() {
@@ -18,6 +19,17 @@ confirm() {
     *) return 0 ;;
   esac
 }
+
+if "$SCRIPT_DIR/verify.sh" > /dev/null 2>&1; then
+  read -r -p "Homebrew is already installed. Reinstall? [y/N] " answer
+  case "$answer" in
+    [yY] | [yY][eE][sS]) ;;
+    *)
+      echo "Skipping Homebrew installation."
+      exit 0
+      ;;
+  esac
+fi
 
 echo "Checking Homebrew install script at $INSTALL_URL..."
 if ! curl -fsSLI "$INSTALL_URL" > /dev/null; then

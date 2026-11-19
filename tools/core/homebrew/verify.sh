@@ -5,6 +5,6 @@
 set -euo pipefail
 
 if ! command -v brew > /dev/null; then
-  echo "Error: Homebrew is not installed. Run bootstrap/homebrew.sh first." >&2
+  echo "Error: Homebrew is not installed. Run tools/core/homebrew/install.sh first." >&2
   exit 1
 fi
