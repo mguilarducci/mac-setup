@@ -38,12 +38,9 @@ if confirm "Add Homebrew to your shell environment ($ZPROFILE)?"; then
   echo >> "$ZPROFILE"
   echo 'eval "$('"$BREW_BIN"' shellenv zsh)"' >> "$ZPROFILE"
   eval "$("$BREW_BIN" shellenv zsh)"
+  # shellcheck disable=SC1090
+  source "$ZPROFILE"
   echo "Homebrew enabled. Open a new terminal or run: source $ZPROFILE"
 else
   echo "Skipped shell configuration."
-fi
-
-if [ -f "$ZPROFILE" ]; then
-  # shellcheck disable=SC1090
-  source "$ZPROFILE"
 fi
