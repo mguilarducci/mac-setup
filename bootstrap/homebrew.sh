@@ -40,7 +40,7 @@ if confirm "Add Homebrew to your shell environment ($ZPROFILE)?"; then
   eval "$("$BREW_BIN" shellenv zsh)"
   # shellcheck disable=SC1090
   source "$ZPROFILE"
-  echo "Homebrew enabled. Open a new terminal or run: source $ZPROFILE"
+  echo "Homebrew enabled."
 else
   echo "Skipped shell configuration."
 fi
