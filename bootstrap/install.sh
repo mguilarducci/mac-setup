@@ -9,10 +9,13 @@
 
 set -euo pipefail
 
+# Some tools install into ~/.local/bin, which is not on the PATH by default.
+grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.zprofile 2> /dev/null ||
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+export PATH="$HOME/.local/bin:$PATH"
+
 REPO_TARBALL="https://github.com/mguilarducci/mac-setup/archive/HEAD.tar.gz"
 BREW_BIN="/opt/homebrew/bin/brew"
-ZPROFILE="$HOME/.zprofile"
-LOCAL_BIN_LINE='export PATH="$HOME/.local/bin:$PATH"'
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-.}")/.." 2> /dev/null && pwd || true)"
 
@@ -22,14 +25,6 @@ if [ ! -d "$ROOT_DIR/tools/core" ]; then
   echo "Downloading mac-setup..."
   curl -fsSL "$REPO_TARBALL" | tar -xz -C "$ROOT_DIR" --strip-components=1
 fi
-
-# Some tools install into ~/.local/bin, which is not on the PATH by default.
-if ! grep -qxF "$LOCAL_BIN_LINE" "$ZPROFILE" 2> /dev/null; then
-  echo >> "$ZPROFILE"
-  echo "$LOCAL_BIN_LINE" >> "$ZPROFILE"
-  echo "Added ~/.local/bin to PATH in $ZPROFILE."
-fi
-export PATH="$HOME/.local/bin:$PATH"
 
 CORE_DIR="$ROOT_DIR/tools/core"
 failed=()
