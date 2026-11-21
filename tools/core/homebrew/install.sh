@@ -10,17 +10,9 @@ BREW_BIN="/opt/homebrew/bin/brew"
 ZPROFILE="$HOME/.zprofile"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Ask a [Y/n] question. Returns 0 for yes (default), 1 for no.
-confirm() {
-  local answer
-  read -r -p "$1 [Y/n] " answer
-  case "$answer" in
-    [nN] | [nN][oO]) return 1 ;;
-    *) return 0 ;;
-  esac
-}
+source "$SCRIPT_DIR/../../../lib/common.sh"
 
-if "$SCRIPT_DIR/verify.sh" > /dev/null 2>&1; then
+if require_brew > /dev/null 2>&1; then
   read -r -p "Homebrew is already installed. Reinstall? [y/N] " answer
   case "$answer" in
     [yY] | [yY][eE][sS]) ;;

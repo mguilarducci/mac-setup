@@ -6,7 +6,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$SCRIPT_DIR/../homebrew/verify.sh"
+source "$SCRIPT_DIR/../../../lib/common.sh"
+
+require_brew
 
 echo "Installing GitHub CLI (gh)..."
 brew install gh
