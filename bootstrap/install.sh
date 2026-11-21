@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# Runs every tools/core/*/install.sh. Homebrew goes first, since other
-# tools depend on it; the rest run in alphabetical order. A failing tool
-# does not stop the others; failures are listed at the end.
+# Runs every tools/core/*/install.sh, then every tools/code/*/install.sh.
+# Homebrew goes first, since other tools depend on it; the rest run in
+# alphabetical order. A failing tool does not stop the others; failures
+# are listed at the end.
 #
 # Works from a local clone or piped from curl. When piped, it downloads
 # the repository to a temporary directory first.
@@ -26,33 +27,47 @@ if [ ! -d "$ROOT_DIR/tools/core" ]; then
   curl -fsSL "$REPO_TARBALL" | tar -xz -C "$ROOT_DIR" --strip-components=1
 fi
 
-CORE_DIR="$ROOT_DIR/tools/core"
+TOOLS_DIR="$ROOT_DIR/tools"
 failed=()
 
 run_tool() {
-  local name="$1"
-  echo "==> $name"
-  if ! bash "$CORE_DIR/$name/install.sh"; then
-    failed+=("$name")
+  local group="$1" name="$2"
+  echo "==> $group/$name"
+  if ! bash "$TOOLS_DIR/$group/$name/install.sh"; then
+    failed+=("$group/$name")
   fi
 }
 
-run_tool homebrew
+# Runs every tool in a group, in alphabetical order, skipping the given names.
+run_group() {
+  local group="$1"
+  shift
+  local script name skip
+  for script in "$TOOLS_DIR/$group"/*/install.sh; do
+    name="$(basename "$(dirname "$script")")"
+    for skip in "$@"; do
+      [ "$name" = "$skip" ] && continue 2
+    done
+    run_tool "$group" "$name"
+  done
+}
+
+run_tool core homebrew
 
 # Make brew available to the next tools in this process.
 if ! command -v brew > /dev/null && [ -x "$BREW_BIN" ]; then
   eval "$("$BREW_BIN" shellenv bash)"
 fi
 
-for script in "$CORE_DIR"/*/install.sh; do
-  name="$(basename "$(dirname "$script")")"
-  [ "$name" = "homebrew" ] && continue
-  run_tool "$name"
-done
+run_group core homebrew
+
+echo
+echo "Starting installation of coding tools..."
+run_group code
 
 if [ "${#failed[@]}" -gt 0 ]; then
   echo "Failed: ${failed[*]}" >&2
   exit 1
 fi
 
-echo "All core tools installed."
+echo "All tools installed."
