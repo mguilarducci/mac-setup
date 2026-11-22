@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Runs every tools/core/*/install.sh, then every tools/code/*/install.sh,
-# then every tools/general/*/install.sh.
+# Runs every tools/core/*/install.sh, then tools/code, tools/general,
+# tools/fonts and tools/terminal, in that order.
 # Homebrew goes first, since other tools depend on it; the rest run in
 # alphabetical order. A failing tool does not stop the others; failures
 # are listed at the end.
@@ -69,6 +69,14 @@ run_group code
 echo
 echo "Starting installation of general tools..."
 run_group general
+
+echo
+echo "Starting installation of fonts..."
+run_group fonts
+
+echo
+echo "Starting installation of terminal tools..."
+run_group terminal
 
 if [ "${#failed[@]}" -gt 0 ]; then
   echo "Failed: ${failed[*]}" >&2
