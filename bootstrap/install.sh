@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Runs every tools/core/*/install.sh, then tools/code, tools/fonts and
-# tools/terminal, in that order.
+# Runs every tools/core/*/install.sh, then tools/code, tools/general,
+# tools/fonts and tools/terminal, in that order.
 # Homebrew goes first, since other tools depend on it; the rest run in
 # alphabetical order. A failing tool does not stop the others; failures
 # are listed at the end.
@@ -65,6 +65,10 @@ run_group core homebrew
 echo
 echo "Starting installation of coding tools..."
 run_group code
+
+echo
+echo "Starting installation of general tools..."
+run_group general
 
 echo
 echo "Starting installation of fonts..."
