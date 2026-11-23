@@ -47,13 +47,16 @@ fi
 add_line "$ZPROFILE" "eval \"\$($BREW_BIN shellenv zsh)\""
 eval "$("$BREW_BIN" shellenv bash)"
 
+# gum styles the rest of this script's messages: https://github.com/charmbracelet/gum
+install_formula gum "gum"
+enable_gum
+
 # ---------------------------------------------------------------------------
 # Command-line tools
 # ---------------------------------------------------------------------------
 section "Command-line tools"
 install_formula gh "GitHub CLI"
 install_formula shellcheck "ShellCheck"
-install_formula gum "gum"
 
 # ---------------------------------------------------------------------------
 # Coding tools

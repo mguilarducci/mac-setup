@@ -11,11 +11,57 @@ else
   BOLD="" DIM="" BLUE="" GREEN="" YELLOW="" RESET=""
 fi
 
-section() { printf '\n%s==> %s%s\n' "$BOLD$BLUE" "$1" "$RESET"; }
-step() { printf '  %s→%s %s\n' "$BLUE" "$RESET" "$1"; }
-ok() { printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$1"; }
-skip() { printf '  %s•%s %s%s%s\n' "$DIM" "$RESET" "$DIM" "$1" "$RESET"; }
-note() { printf '  %s!%s %s%s%s\n' "$YELLOW" "$RESET" "$YELLOW" "$1" "$RESET"; }
+USE_GUM=false
+ACCENT=212 # pink
+
+# Switches logging to gum when it is available and we are on a terminal.
+# Commands still print straight to the terminal: gum only styles our messages.
+enable_gum() {
+  if [ -t 1 ] && command -v gum > /dev/null; then
+    USE_GUM=true
+  fi
+}
+
+section() {
+  if $USE_GUM; then
+    echo
+    gum style --bold --foreground "$ACCENT" "==> $1"
+  else
+    printf '\n%s==> %s%s\n' "$BOLD$BLUE" "$1" "$RESET"
+  fi
+}
+
+step() {
+  if $USE_GUM; then
+    echo "  $(gum style --foreground 4 '→') $1"
+  else
+    printf '  %s→%s %s\n' "$BLUE" "$RESET" "$1"
+  fi
+}
+
+ok() {
+  if $USE_GUM; then
+    echo "  $(gum style --foreground 2 '✓') $1"
+  else
+    printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$1"
+  fi
+}
+
+skip() {
+  if $USE_GUM; then
+    gum style --faint "  • $1"
+  else
+    printf '  %s•%s %s%s%s\n' "$DIM" "$RESET" "$DIM" "$1" "$RESET"
+  fi
+}
+
+note() {
+  if $USE_GUM; then
+    gum style --foreground 3 "  ! $1"
+  else
+    printf '  %s!%s %s%s%s\n' "$YELLOW" "$RESET" "$YELLOW" "$1" "$RESET"
+  fi
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -62,5 +108,10 @@ install_cask() {
 }
 
 finish() {
+  if $USE_GUM; then
+    echo
+    gum style --bold --foreground 2 "Done. Open a new terminal to load the changes."
+    return
+  fi
   printf '\n%sDone.%s Open a new terminal to load the changes.\n' "$BOLD$GREEN" "$RESET"
 }
