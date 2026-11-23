@@ -9,63 +9,21 @@ ZSHRC="$HOME/.zshrc"
 BREW_BIN="/opt/homebrew/bin/brew"
 
 # ---------------------------------------------------------------------------
-# Logging
+# Load helpers from lib.sh: next to this file when run from a clone, or
+# downloaded from GitHub when run through curl.
 # ---------------------------------------------------------------------------
-if [ -t 1 ]; then
-  BOLD=$'\033[1m' BLUE=$'\033[34m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RESET=$'\033[0m'
-else
-  BOLD="" BLUE="" GREEN="" YELLOW="" RESET=""
+LIB_URL="https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/lib.sh"
+SCRIPT_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fi
-
-section() { printf '\n%s==> %s%s\n' "$BOLD$BLUE" "$1" "$RESET"; }
-step() { printf '  %s->%s %s\n' "$BLUE" "$RESET" "$1"; }
-ok() { printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$1"; }
-skip() { printf '  %s-%s %s\n' "$YELLOW" "$RESET" "$1"; }
-note() { printf '  %s!%s %s\n' "$YELLOW" "$RESET" "$1"; }
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-# Appends a line to a file unless it is already there.
-add_line() {
-  if grep -qxF "$2" "$1" 2> /dev/null; then
-    skip "Already in $1: $2"
-  else
-    echo "$2" >> "$1"
-    ok "Added to $1: $2"
-  fi
-}
-
-# install_formula <formula> <name>
-install_formula() {
-  local formula="$1" name="$2"
-  if brew list --formula "$formula" &> /dev/null; then
-    skip "$name is already installed"
-    return
-  fi
-  step "Installing $name..."
-  brew install "$formula"
-  ok "$name installed"
-}
-
-# install_cask <cask> <name> [App.app]
-# When an app name is given and that app is already in /Applications but was
-# not installed by Homebrew (e.g. downloaded from the website), the cask is
-# skipped; otherwise brew would fail because the app already exists.
-install_cask() {
-  local cask="$1" name="$2" app="${3:-}"
-  if brew list --cask "$cask" &> /dev/null; then
-    skip "$name is already installed"
-    return
-  fi
-  if [ -n "$app" ] && [ -d "/Applications/$app" ]; then
-    skip "$name is already in /Applications/$app (installed outside Homebrew)"
-    return
-  fi
-  step "Installing $name..."
-  brew install --cask "$cask"
-  ok "$name installed"
-}
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/lib.sh" ]; then
+  # shellcheck source=lib.sh
+  source "$SCRIPT_DIR/lib.sh"
+else
+  LIB="$(curl -fsSL "$LIB_URL")"
+  eval "$LIB"
+fi
 
 # ---------------------------------------------------------------------------
 # Shell PATH
@@ -88,6 +46,12 @@ else
 fi
 add_line "$ZPROFILE" "eval \"\$($BREW_BIN shellenv zsh)\""
 eval "$("$BREW_BIN" shellenv bash)"
+
+# gum makes the rest of this script look nicer: https://github.com/charmbracelet/gum
+install_formula gum "gum"
+enable_gum
+
+banner
 
 # ---------------------------------------------------------------------------
 # Command-line tools
@@ -157,4 +121,4 @@ section "Starship prompt"
 install_formula starship "Starship"
 add_line "$ZSHRC" 'eval "$(starship init zsh)"'
 
-printf '\n%sDone.%s Open a new terminal to load the changes.\n' "$BOLD$GREEN" "$RESET"
+finish
