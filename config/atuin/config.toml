@@ -1,0 +1,8 @@
+# Linked to ~/.atuin/config.toml by install.sh.
+# Options: https://docs.atuin.sh/latest/configuration/config/
+
+# Enter runs the selected command right away.
+enter_accept = true
+
+# Show a notice when a new Atuin version is out (updates still come from brew).
+update_check = true

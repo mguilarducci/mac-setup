@@ -76,6 +76,69 @@ add_line() {
   fi
 }
 
+# Removes a line from a file if it is there (exact match).
+remove_line() {
+  local file="$1" line="$2" tmp
+  grep -qxF "$line" "$file" 2> /dev/null || return 0
+  tmp="$(mktemp)"
+  grep -vxF "$line" "$file" > "$tmp" || true
+  cat "$tmp" > "$file"
+  rm -f "$tmp"
+  ok "Removed from $file: $line"
+}
+
+# remove_block <file> <start marker> <end marker>
+# Removes the lines from the start marker to the end marker, inclusive.
+remove_block() {
+  local file="$1" start="$2" end="$3" tmp
+  grep -qxF "$start" "$file" 2> /dev/null || return 0
+  tmp="$(mktemp)"
+  awk -v s="$start" -v e="$end" '$0 == s { skip = 1 } !skip { print } $0 == e { skip = 0 }' "$file" > "$tmp"
+  cat "$tmp" > "$file"
+  rm -f "$tmp"
+  ok "Removed the block \"$start\" from $file"
+}
+
+# source_config <rc file> <config dir> <path under config dir>
+# Makes <rc file> source <config dir>/<path>. Lines that source the same file
+# from another copy of the repo (e.g. an old clone) are removed.
+source_config() {
+  local file="$1" dir="$2" rel="$3" want old olds
+  want="source \"$dir/$rel\""
+  olds="$(grep -F "/config/$rel\"" "$file" 2> /dev/null | grep -E '^source "' || true)"
+  while IFS= read -r old; do
+    if [ -n "$old" ] && [ "$old" != "$want" ]; then
+      remove_line "$file" "$old"
+    fi
+  done <<< "$olds"
+  add_line "$file" "$want"
+}
+
+# link <source> <target>
+# Points <target> at <source> with a symlink. A symlink already at <target>
+# is replaced; a real file or directory is moved to <target>.bak.<timestamp>.
+link() {
+  local src="$1" dst="$2" backup
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    skip "$dst already links to $src"
+    return
+  fi
+  mkdir -p "$(dirname "$dst")"
+  if [ -L "$dst" ]; then
+    rm "$dst"
+    ln -s "$src" "$dst"
+    ok "Relinked $dst -> $src"
+    return
+  fi
+  if [ -e "$dst" ]; then
+    backup="$dst.bak.$(date +%Y%m%d%H%M%S)"
+    mv "$dst" "$backup"
+    note "Moved the old $dst to $backup"
+  fi
+  ln -s "$src" "$dst"
+  ok "Linked $dst -> $src"
+}
+
 # install_formula <formula> <name>
 install_formula() {
   local formula="$1" name="$2"
