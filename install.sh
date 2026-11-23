@@ -7,6 +7,9 @@ set -euo pipefail
 ZPROFILE="$HOME/.zprofile"
 ZSHRC="$HOME/.zshrc"
 BREW_BIN="/opt/homebrew/bin/brew"
+REPO_URL="https://github.com/mguilarducci/mac-setup.git"
+# Where the repo is cloned when this script runs through curl.
+REPO_CLONE="$HOME/.mac-setup"
 
 # ---------------------------------------------------------------------------
 # Load helpers from lib.sh: next to this file when run from a clone, or
@@ -25,12 +28,8 @@ else
   eval "$LIB"
 fi
 
-# ---------------------------------------------------------------------------
-# Shell PATH
-# ---------------------------------------------------------------------------
-section "Shell PATH"
-# Some tools install into ~/.local/bin, which is not on the PATH by default.
-add_line "$ZPROFILE" 'export PATH="$HOME/.local/bin:$PATH"'
+# Some tools install into ~/.local/bin. config/zsh/zprofile.zsh adds it to the
+# PATH for new shells; this does it for the rest of this run.
 export PATH="$HOME/.local/bin:$PATH"
 
 # ---------------------------------------------------------------------------
@@ -44,7 +43,6 @@ if ! command -v brew > /dev/null && [ ! -x "$BREW_BIN" ]; then
 else
   skip "Homebrew is already installed"
 fi
-add_line "$ZPROFILE" "eval \"\$($BREW_BIN shellenv zsh)\""
 eval "$("$BREW_BIN" shellenv bash)"
 
 # gum styles the rest of this script's messages: https://github.com/charmbracelet/gum
@@ -52,11 +50,38 @@ install_formula gum "gum"
 enable_gum
 
 # ---------------------------------------------------------------------------
+# This repo (for the files in config/). Needs git, which comes with the Xcode
+# Command Line Tools that the Homebrew installer sets up.
+# ---------------------------------------------------------------------------
+section "mac-setup repo"
+if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/config" ]; then
+  REPO_DIR="$SCRIPT_DIR"
+  skip "Using the config files in $REPO_DIR"
+elif [ -d "$REPO_CLONE/.git" ]; then
+  REPO_DIR="$REPO_CLONE"
+  step "Updating $REPO_DIR..."
+  if git -C "$REPO_DIR" pull --ff-only --quiet; then
+    ok "$REPO_DIR is up to date"
+  else
+    note "Could not update $REPO_DIR; using it as it is"
+  fi
+else
+  REPO_DIR="$REPO_CLONE"
+  step "Cloning mac-setup into $REPO_DIR..."
+  git clone --quiet "$REPO_URL" "$REPO_DIR"
+  ok "Cloned into $REPO_DIR"
+fi
+CONFIG_DIR="$REPO_DIR/config"
+
+# ---------------------------------------------------------------------------
 # Command-line tools
 # ---------------------------------------------------------------------------
 section "Command-line tools"
 install_formula gh "GitHub CLI"
 install_formula shellcheck "ShellCheck"
+install_formula ripgrep "ripgrep"
+install_formula zoxide "zoxide"
+install_formula atuin "Atuin"
 
 # ---------------------------------------------------------------------------
 # Coding tools
@@ -76,47 +101,57 @@ section "Apps"
 install_cask slack "Slack" "Slack.app"
 
 # ---------------------------------------------------------------------------
-# 1Password CLI
+# 1Password CLI (op-sa() lives in config/zsh/op-sa.zsh)
 # ---------------------------------------------------------------------------
 section "1Password CLI"
 install_cask 1password-cli "1Password CLI"
-
-# op-sa <keychain-item> <op args...> runs op with a service account token read
-# from the Keychain. The plain `op` command is left untouched.
-if grep -qF "# >>> op service account >>>" "$ZSHRC" 2> /dev/null; then
-  skip "op-sa() is already in $ZSHRC"
-else
-  cat >> "$ZSHRC" << 'EOF'
-
-# >>> op service account >>>
-op-sa() {
-  if [ $# -lt 1 ]; then
-    echo "Usage: op-sa <keychain-item> [op args...]" >&2
-    return 1
-  fi
-  local item="$1" token
-  shift
-  token="$(security find-generic-password -a "$USER" -s "$item" -w)" || return
-  OP_SERVICE_ACCOUNT_TOKEN="$token" command op "$@"
-}
-# <<< op service account <<<
-EOF
-  ok "Added op-sa() to $ZSHRC"
-  note "Store a token with: security add-generic-password -U -a \"\$USER\" -s <keychain-item> -w"
-fi
 
 # ---------------------------------------------------------------------------
 # Fonts
 # ---------------------------------------------------------------------------
 section "Fonts"
 install_cask font-jetbrains-mono-nerd-font "JetBrains Mono Nerd Font"
-note "Select \"JetBrainsMono Nerd Font\" in your terminal's font settings (Ghostty: font-family = \"JetBrainsMono Nerd Font\")."
+note "Ghostty uses it through config/ghostty. In other terminals, select \"JetBrainsMono Nerd Font\" in the font settings."
 
 # ---------------------------------------------------------------------------
 # Starship prompt (needs the Nerd Font above)
 # ---------------------------------------------------------------------------
 section "Starship prompt"
 install_formula starship "Starship"
-add_line "$ZSHRC" 'eval "$(starship init zsh)"'
+
+# ---------------------------------------------------------------------------
+# Neovim + LazyVim (https://www.lazyvim.org). Also uses ripgrep from above and
+# the Nerd Font. The LazyVim config lives in config/nvim.
+# ---------------------------------------------------------------------------
+section "Neovim + LazyVim"
+install_formula neovim "Neovim"
+install_formula tree-sitter-cli "tree-sitter CLI"
+
+# ---------------------------------------------------------------------------
+# Shell config: ~/.zprofile and ~/.zshrc only load the files in config/zsh,
+# so other installers can still add their own lines to them.
+# ---------------------------------------------------------------------------
+section "Shell config"
+add_line "$ZPROFILE" "source \"$CONFIG_DIR/zsh/zprofile.zsh\""
+add_line "$ZSHRC" "source \"$CONFIG_DIR/zsh/zshrc.zsh\""
+
+# Older versions of this script wrote these straight into the files.
+remove_line "$ZPROFILE" 'export PATH="$HOME/.local/bin:$PATH"'
+remove_line "$ZPROFILE" "eval \"\$($BREW_BIN shellenv zsh)\""
+remove_line "$ZSHRC" 'eval "$(starship init zsh)"'
+remove_block "$ZSHRC" "# >>> op service account >>>" "# <<< op service account <<<"
+
+# ---------------------------------------------------------------------------
+# App config: only the config files are symlinks into config/. Whatever the
+# apps write next to them (lock files, state) stays out of the repo.
+# ---------------------------------------------------------------------------
+section "App config"
+link "$CONFIG_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+link "$CONFIG_DIR/atuin/config.toml" "$HOME/.atuin/config.toml"
+link "$CONFIG_DIR/ghostty/config.ghostty" "$HOME/.config/ghostty/config.ghostty"
+for file in init.lua lua .neoconf.json stylua.toml; do
+  link "$CONFIG_DIR/nvim/$file" "$HOME/.config/nvim/$file"
+done
+note "Run nvim once to install the plugins, then :LazyHealth to check the setup."
 
 finish
