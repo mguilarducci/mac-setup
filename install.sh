@@ -111,7 +111,7 @@ install_cask 1password-cli "1Password CLI"
 # ---------------------------------------------------------------------------
 section "Fonts"
 install_cask font-jetbrains-mono-nerd-font "JetBrains Mono Nerd Font"
-note "Ghostty ships JetBrains Mono with the icons built in. In other apps, select \"JetBrainsMono Nerd Font\" in the font settings."
+note "Ghostty uses it through config/ghostty. In other terminals, select \"JetBrainsMono Nerd Font\" in the font settings."
 
 # ---------------------------------------------------------------------------
 # Starship prompt (needs the Nerd Font above)

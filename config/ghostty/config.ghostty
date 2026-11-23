@@ -1,5 +1,5 @@
 # Linked to ~/.config/ghostty/config.ghostty by install.sh.
 # Options: https://ghostty.org/docs/config/reference
-#
-# Ghostty already ships JetBrains Mono with Nerd Font icons built in, so no
-# font-family is needed here.
+
+# Nerd Font installed by install.sh; Starship and LazyVim use its icons.
+font-family = "JetBrainsMono Nerd Font"
