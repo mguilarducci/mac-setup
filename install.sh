@@ -80,6 +80,7 @@ section "Command-line tools"
 install_formula gh "GitHub CLI"
 install_formula shellcheck "ShellCheck"
 install_formula ripgrep "ripgrep"
+install_formula fd "fd"
 install_formula zoxide "zoxide"
 install_formula atuin "Atuin"
 
@@ -120,8 +121,9 @@ section "Starship prompt"
 install_formula starship "Starship"
 
 # ---------------------------------------------------------------------------
-# Neovim + LazyVim (https://www.lazyvim.org). Also uses ripgrep from above and
-# the Nerd Font. The LazyVim config lives in config/nvim.
+# Neovim + LazyVim (https://www.lazyvim.org). Also uses ripgrep and fd from
+# above (fd is needed to search in the file explorer) and the Nerd Font. The
+# LazyVim config lives in config/nvim.
 # ---------------------------------------------------------------------------
 section "Neovim + LazyVim"
 install_formula neovim "Neovim"
