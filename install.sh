@@ -47,18 +47,13 @@ fi
 add_line "$ZPROFILE" "eval \"\$($BREW_BIN shellenv zsh)\""
 eval "$("$BREW_BIN" shellenv bash)"
 
-# gum makes the rest of this script look nicer: https://github.com/charmbracelet/gum
-install_formula gum "gum"
-enable_gum
-
-banner
-
 # ---------------------------------------------------------------------------
 # Command-line tools
 # ---------------------------------------------------------------------------
 section "Command-line tools"
 install_formula gh "GitHub CLI"
 install_formula shellcheck "ShellCheck"
+install_formula gum "gum"
 
 # ---------------------------------------------------------------------------
 # Coding tools
