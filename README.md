@@ -2,8 +2,8 @@
 
 ## Getting started
 
-### Install core dependencies
+### Install
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/bootstrap/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/install.sh)"
 ```
