@@ -132,8 +132,8 @@ install_formula tree-sitter-cli "tree-sitter CLI"
 # so other installers can still add their own lines to them.
 # ---------------------------------------------------------------------------
 section "Shell config"
-add_line "$ZPROFILE" "source \"$CONFIG_DIR/zsh/zprofile.zsh\""
-add_line "$ZSHRC" "source \"$CONFIG_DIR/zsh/zshrc.zsh\""
+source_config "$ZPROFILE" "$CONFIG_DIR" zsh/zprofile.zsh
+source_config "$ZSHRC" "$CONFIG_DIR" zsh/zshrc.zsh
 
 # Older versions of this script wrote these straight into the files.
 remove_line "$ZPROFILE" 'export PATH="$HOME/.local/bin:$PATH"'

@@ -99,9 +99,24 @@ remove_block() {
   ok "Removed the block \"$start\" from $file"
 }
 
+# source_config <rc file> <config dir> <path under config dir>
+# Makes <rc file> source <config dir>/<path>. Lines that source the same file
+# from another copy of the repo (e.g. an old clone) are removed.
+source_config() {
+  local file="$1" dir="$2" rel="$3" want old olds
+  want="source \"$dir/$rel\""
+  olds="$(grep -F "/config/$rel\"" "$file" 2> /dev/null | grep -E '^source "' || true)"
+  while IFS= read -r old; do
+    if [ -n "$old" ] && [ "$old" != "$want" ]; then
+      remove_line "$file" "$old"
+    fi
+  done <<< "$olds"
+  add_line "$file" "$want"
+}
+
 # link <source> <target>
-# Points <target> at <source> with a symlink. Whatever was at <target> before
-# is moved to <target>.bak.<timestamp>.
+# Points <target> at <source> with a symlink. A symlink already at <target>
+# is replaced; a real file or directory is moved to <target>.bak.<timestamp>.
 link() {
   local src="$1" dst="$2" backup
   if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
@@ -109,7 +124,13 @@ link() {
     return
   fi
   mkdir -p "$(dirname "$dst")"
-  if [ -e "$dst" ] || [ -L "$dst" ]; then
+  if [ -L "$dst" ]; then
+    rm "$dst"
+    ln -s "$src" "$dst"
+    ok "Relinked $dst -> $src"
+    return
+  fi
+  if [ -e "$dst" ]; then
     backup="$dst.bak.$(date +%Y%m%d%H%M%S)"
     mv "$dst" "$backup"
     note "Moved the old $dst to $backup"
