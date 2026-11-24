@@ -63,12 +63,13 @@ note() {
   fi
 }
 
-# detail <key> <value>: an indented key/value line under the previous message.
+# detail <key> <value>: an indented key/value line (bold key) under the
+# previous message.
 detail() {
   if $USE_GUM; then
-    gum style --faint "      $1: $2"
+    echo "      $(gum style --bold "$1:") $(gum style --faint "$2")"
   else
-    printf '      %s%s: %s%s\n' "$DIM" "$1" "$2" "$RESET"
+    printf '      %s%s:%s %s%s%s\n' "$BOLD" "$1" "$RESET" "$DIM" "$2" "$RESET"
   fi
 }
 
@@ -146,6 +147,25 @@ link() {
   fi
   ln -s "$src" "$dst"
   ok "Linked $dst -> $src"
+}
+
+# repo_details <repo dir>
+# Prints where the repo comes from and the commit in use, e.g.
+#   url: https://github.com/<owner>/<repo>.git
+#   source: github:<owner>/<repo>
+#   commit: 1a2b3c4
+repo_details() {
+  local url path host
+  url="$(git -C "$1" remote get-url origin 2> /dev/null || true)"
+  if [ -n "$url" ]; then
+    path="${url#*://}" # drop https://, ssh://
+    path="${path#*@}"  # drop git@
+    host="${path%%[:/]*}"
+    path="${path#*[:/]}"
+    detail url "$url"
+    detail source "${host%%.*}:${path%.git}"
+  fi
+  detail commit "$(git -C "$1" rev-parse --short HEAD)"
 }
 
 # install_formula <formula> <name>

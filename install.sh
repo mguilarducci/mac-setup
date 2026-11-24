@@ -56,7 +56,7 @@ enable_gum
 section "mac-setup repo"
 if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/config" ]; then
   REPO_DIR="$SCRIPT_DIR"
-  skip "Using the config files in $REPO_DIR"
+  skip "Running from a local clone"
 elif [ -d "$REPO_CLONE/.git" ]; then
   REPO_DIR="$REPO_CLONE"
   step "Updating $REPO_DIR..."
@@ -72,6 +72,8 @@ else
   ok "Cloned into $REPO_DIR"
 fi
 CONFIG_DIR="$REPO_DIR/config"
+detail "clone destination" "$REPO_DIR"
+repo_details "$REPO_DIR"
 
 # ---------------------------------------------------------------------------
 # Command-line tools
