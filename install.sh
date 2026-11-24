@@ -169,4 +169,9 @@ for file in init.lua lua .neoconf.json stylua.toml; do
 done
 note "Run nvim once to install the plugins, then :LazyHealth to check the setup."
 
+# Herdr's agents read AGENTS.local.md; this points them at the rules that keep
+# config/herdr-app/personal-mods.json (the installed community mods) in sync.
+read_config "$HOME/.config/herdr-app/AGENTS.local.md" "$CONFIG_DIR" herdr-app/sync.md
+note "To get the Herdr mods back, ask an agent in Herdr to restore them."
+
 finish

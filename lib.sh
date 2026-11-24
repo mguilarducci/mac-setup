@@ -124,6 +124,23 @@ source_config() {
   add_line "$file" "$want"
 }
 
+# read_config <notes file> <config dir> <path under config dir>
+# Makes an agent notes file (like AGENTS.local.md) say "Also read
+# <config dir>/<path>.". Lines that point at the same file in another copy of
+# the repo (e.g. an old clone) are removed.
+read_config() {
+  local file="$1" dir="$2" rel="$3" want old olds
+  want="Also read $dir/$rel."
+  olds="$(grep -F "/config/$rel." "$file" 2> /dev/null | grep -E '^Also read ' || true)"
+  while IFS= read -r old; do
+    if [ -n "$old" ] && [ "$old" != "$want" ]; then
+      remove_line "$file" "$old"
+    fi
+  done <<< "$olds"
+  mkdir -p "$(dirname "$file")"
+  add_line "$file" "$want"
+}
+
 # link <source> <target>
 # Points <target> at <source> with a symlink. A symlink already at <target>
 # is replaced; a real file or directory is moved to <target>.bak.<timestamp>.
