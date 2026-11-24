@@ -84,6 +84,7 @@ install_formula fd "fd"
 install_formula zoxide "zoxide"
 install_formula atuin "Atuin"
 install_formula openbao "OpenBao"
+install_formula mosquitto "Mosquitto (mosquitto_sub, mosquitto_pub)"
 
 # ---------------------------------------------------------------------------
 # Coding tools
