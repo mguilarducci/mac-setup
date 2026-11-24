@@ -63,6 +63,16 @@ note() {
   fi
 }
 
+# detail <key> <value>: an indented key/value line (bold key) under the
+# previous message.
+detail() {
+  if $USE_GUM; then
+    echo "      $(gum style --bold "$1:") $(gum style --faint "$2")"
+  else
+    printf '      %s%s:%s %s%s%s\n' "$BOLD" "$1" "$RESET" "$DIM" "$2" "$RESET"
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -139,14 +149,35 @@ link() {
   ok "Linked $dst -> $src"
 }
 
+# repo_details <repo dir>
+# Prints where the repo comes from and the commit in use, e.g.
+#   url: https://github.com/<owner>/<repo>.git
+#   source: github:<owner>/<repo>
+#   commit: 1a2b3c4
+repo_details() {
+  local url path host
+  url="$(git -C "$1" remote get-url origin 2> /dev/null || true)"
+  if [ -n "$url" ]; then
+    path="${url#*://}" # drop https://, ssh://
+    path="${path#*@}"  # drop git@
+    host="${path%%[:/]*}"
+    path="${path#*[:/]}"
+    detail url "$url"
+    detail source "${host%%.*}:${path%.git}"
+  fi
+  detail commit "$(git -C "$1" rev-parse --short HEAD)"
+}
+
 # install_formula <formula> <name>
 install_formula() {
   local formula="$1" name="$2"
   if brew list --formula "$formula" &> /dev/null; then
     skip "$name is already installed"
+    detail type formula
     return
   fi
   step "Installing $name..."
+  detail type formula
   brew install "$formula"
   ok "$name installed"
 }
@@ -156,12 +187,17 @@ install_formula() {
 # Homebrew refuses to load casks from untrusted taps.
 use_tap_cask() {
   local cask="$1" tap="${1%/*}"
-  if ! brew tap | grep -qxF "$tap"; then
+  if brew tap | grep -qxF "$tap"; then
+    skip "Tap $tap is already added"
+  else
     step "Tapping $tap..."
     brew tap "$tap"
     ok "Tapped $tap"
   fi
-  if ! brew trust --json v1 | grep -qF "\"$cask\""; then
+  if brew trust --json v1 | grep -qF "\"$cask\""; then
+    skip "Cask $cask is already trusted"
+  else
+    step "Trusting cask $cask..."
     brew trust --cask "$cask"
     ok "Trusted $cask"
   fi
@@ -173,19 +209,33 @@ use_tap_cask() {
 # not installed by Homebrew (e.g. downloaded from the website), the cask is
 # skipped; otherwise brew would fail because the app already exists.
 install_cask() {
-  local cask="$1" name="$2" app="${3:-}"
-  case "$cask" in */*/*) use_tap_cask "$cask" ;; esac
+  local cask="$1" name="$2" app="${3:-}" tap=""
+  case "$cask" in */*/*)
+    tap="${cask%/*}"
+    use_tap_cask "$cask"
+    ;;
+  esac
   if brew list --cask "$cask" &> /dev/null; then
     skip "$name is already installed"
+    cask_details "$app" "$tap"
     return
   fi
   if [ -n "$app" ] && [ -d "/Applications/$app" ]; then
     skip "$name is already in /Applications/$app (installed outside Homebrew)"
+    cask_details "$app" "$tap"
     return
   fi
   step "Installing $name..."
+  cask_details "$app" "$tap"
   brew install --cask "$cask"
   ok "$name installed"
+}
+
+# cask_details <App.app or ""> <tap or "">
+cask_details() {
+  detail type cask
+  if [ -n "$1" ]; then detail app "$1"; fi
+  if [ -n "$2" ]; then detail tap "$2"; fi
 }
 
 finish() {

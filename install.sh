@@ -49,6 +49,19 @@ eval "$("$BREW_BIN" shellenv bash)"
 install_formula gum "gum"
 enable_gum
 
+# Update Homebrew and its package lists, then upgrade anything outdated.
+step "Updating Homebrew..."
+brew update
+ok "Homebrew is up to date"
+if [ -n "$(brew outdated --quiet)" ]; then
+  step "Upgrading outdated packages..."
+  brew outdated
+  brew upgrade
+  ok "Packages upgraded"
+else
+  skip "No outdated packages"
+fi
+
 # ---------------------------------------------------------------------------
 # This repo (for the files in config/). Needs git, which comes with the Xcode
 # Command Line Tools that the Homebrew installer sets up.
@@ -56,7 +69,7 @@ enable_gum
 section "mac-setup repo"
 if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/config" ]; then
   REPO_DIR="$SCRIPT_DIR"
-  skip "Using the config files in $REPO_DIR"
+  skip "Running from a local clone"
 elif [ -d "$REPO_CLONE/.git" ]; then
   REPO_DIR="$REPO_CLONE"
   step "Updating $REPO_DIR..."
@@ -72,6 +85,8 @@ else
   ok "Cloned into $REPO_DIR"
 fi
 CONFIG_DIR="$REPO_DIR/config"
+detail "clone destination" "$REPO_DIR"
+repo_details "$REPO_DIR"
 
 # ---------------------------------------------------------------------------
 # Command-line tools
@@ -83,7 +98,6 @@ install_formula ripgrep "ripgrep"
 install_formula fd "fd"
 install_formula zoxide "zoxide"
 install_formula atuin "Atuin"
-install_formula openbao "OpenBao"
 install_formula mosquitto "Mosquitto (mosquitto_sub, mosquitto_pub)"
 install_formula skillshare "Skillshare CLI"
 
@@ -108,10 +122,11 @@ install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
 install_cask superwhisper "Superwhisper" "superwhisper.app"
 
 # ---------------------------------------------------------------------------
-# 1Password CLI (op-sa() lives in config/zsh/op-sa.zsh)
+# Secrets managers (op-sa() for the 1Password CLI lives in config/zsh/op-sa.zsh)
 # ---------------------------------------------------------------------------
-section "1Password CLI"
+section "Secrets managers"
 install_cask 1password-cli "1Password CLI"
+install_formula openbao "OpenBao"
 
 # ---------------------------------------------------------------------------
 # Fonts
