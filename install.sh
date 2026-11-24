@@ -49,6 +49,19 @@ eval "$("$BREW_BIN" shellenv bash)"
 install_formula gum "gum"
 enable_gum
 
+# Update Homebrew and its package lists, then upgrade anything outdated.
+step "Updating Homebrew..."
+brew update
+ok "Homebrew is up to date"
+if [ -n "$(brew outdated --quiet)" ]; then
+  step "Upgrading outdated packages..."
+  brew outdated
+  brew upgrade
+  ok "Packages upgraded"
+else
+  skip "No outdated packages"
+fi
+
 # ---------------------------------------------------------------------------
 # This repo (for the files in config/). Needs git, which comes with the Xcode
 # Command Line Tools that the Homebrew installer sets up.
