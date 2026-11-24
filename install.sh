@@ -33,7 +33,7 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # ---------------------------------------------------------------------------
-# Requirements: Homebrew, gum, and this repo (for the files in config/).
+# Requirements: Homebrew, git, gum, and this repo (for the files in config/).
 # ---------------------------------------------------------------------------
 section "Requirements"
 if ! command -v brew > /dev/null && [ ! -x "$BREW_BIN" ]; then
@@ -44,6 +44,7 @@ else
   skip "Homebrew is already installed"
 fi
 eval "$("$BREW_BIN" shellenv bash)"
+install_formula git "Git"
 
 # gum styles the rest of this script's messages: https://github.com/charmbracelet/gum
 install_formula gum "gum"
@@ -62,8 +63,7 @@ else
   skip "No outdated packages"
 fi
 
-# This repo. Needs git, which comes with the Xcode Command Line Tools that the
-# Homebrew installer sets up.
+# This repo. Uses the git installed above.
 if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/config" ]; then
   REPO_DIR="$SCRIPT_DIR"
   skip "Running from a local clone"
