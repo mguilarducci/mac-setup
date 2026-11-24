@@ -83,7 +83,6 @@ install_formula ripgrep "ripgrep"
 install_formula fd "fd"
 install_formula zoxide "zoxide"
 install_formula atuin "Atuin"
-install_formula openbao "OpenBao"
 install_formula mosquitto "Mosquitto (mosquitto_sub, mosquitto_pub)"
 install_formula skillshare "Skillshare CLI"
 
@@ -107,10 +106,11 @@ install_cask obsidian "Obsidian" "Obsidian.app"
 install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
 
 # ---------------------------------------------------------------------------
-# 1Password CLI (op-sa() lives in config/zsh/op-sa.zsh)
+# Secrets managers (op-sa() for the 1Password CLI lives in config/zsh/op-sa.zsh)
 # ---------------------------------------------------------------------------
-section "1Password CLI"
+section "Secrets managers"
 install_cask 1password-cli "1Password CLI"
+install_formula openbao "OpenBao"
 
 # ---------------------------------------------------------------------------
 # Fonts
