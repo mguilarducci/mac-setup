@@ -33,9 +33,9 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # ---------------------------------------------------------------------------
-# Homebrew
+# Requirements: Homebrew, gum, and this repo (for the files in config/).
 # ---------------------------------------------------------------------------
-section "Homebrew"
+section "Requirements"
 if ! command -v brew > /dev/null && [ ! -x "$BREW_BIN" ]; then
   step "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -62,11 +62,8 @@ else
   skip "No outdated packages"
 fi
 
-# ---------------------------------------------------------------------------
-# This repo (for the files in config/). Needs git, which comes with the Xcode
-# Command Line Tools that the Homebrew installer sets up.
-# ---------------------------------------------------------------------------
-section "mac-setup repo"
+# This repo. Needs git, which comes with the Xcode Command Line Tools that the
+# Homebrew installer sets up.
 if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/config" ]; then
   REPO_DIR="$SCRIPT_DIR"
   skip "Running from a local clone"
@@ -89,37 +86,54 @@ detail "clone destination" "$REPO_DIR"
 repo_details "$REPO_DIR"
 
 # ---------------------------------------------------------------------------
-# Command-line tools
+# Terminal, prompts & shell tools. Ghostty and Starship use the Nerd Font.
 # ---------------------------------------------------------------------------
-section "Command-line tools"
-install_formula gh "GitHub CLI"
-install_formula shellcheck "ShellCheck"
-install_formula ripgrep "ripgrep"
-install_formula fd "fd"
+section "Terminal, prompts & shell tools"
+install_cask ghostty "Ghostty" "Ghostty.app"
+install_cask herdr-app "Herdr" "Herdr.app"
+install_cask font-jetbrains-mono-nerd-font "JetBrains Mono Nerd Font"
+note "Ghostty uses it through config/ghostty. In other terminals, select \"JetBrainsMono Nerd Font\" in the font settings."
+install_formula starship "Starship"
 install_formula zoxide "zoxide"
 install_formula atuin "Atuin"
-install_formula mosquitto "Mosquitto (mosquitto_sub, mosquitto_pub)"
-install_formula skillshare "Skillshare CLI"
+install_formula ripgrep "ripgrep"
+install_formula fd "fd"
 
 # ---------------------------------------------------------------------------
-# Coding tools
+# Dev tools. Neovim + LazyVim (https://www.lazyvim.org) also uses ripgrep and
+# fd from above (fd is needed to search in the file explorer) and the Nerd
+# Font. The LazyVim config lives in config/nvim.
 # ---------------------------------------------------------------------------
-section "Coding tools"
-install_cask claude-code "Claude Code"
-install_cask codex "Codex"
+section "Dev tools"
+install_formula neovim "Neovim"
+install_formula tree-sitter-cli "tree-sitter CLI"
+install_formula gh "GitHub CLI"
+install_formula shellcheck "ShellCheck"
 install_cask docker-desktop "Docker Desktop" "Docker.app"
 note "Open Docker Desktop once to accept the license: open -a Docker"
-install_cask herdr-app "Herdr" "Herdr.app"
-install_cask ghostty "Ghostty" "Ghostty.app"
+install_formula mosquitto "Mosquitto (mosquitto_sub, mosquitto_pub)"
 
 # ---------------------------------------------------------------------------
-# Apps
+# AI
 # ---------------------------------------------------------------------------
-section "Apps"
-install_cask slack "Slack" "Slack.app"
-install_cask obsidian "Obsidian" "Obsidian.app"
+section "AI"
+install_cask claude-code "Claude Code"
+install_cask codex "Codex"
+install_formula skillshare "Skillshare CLI"
 install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
+
+# ---------------------------------------------------------------------------
+# Productivity
+# ---------------------------------------------------------------------------
+section "Productivity"
+install_cask obsidian "Obsidian" "Obsidian.app"
 install_cask superwhisper "Superwhisper" "superwhisper.app"
+
+# ---------------------------------------------------------------------------
+# Social networking
+# ---------------------------------------------------------------------------
+section "Social networking"
+install_cask slack "Slack" "Slack.app"
 
 # ---------------------------------------------------------------------------
 # Secrets managers (op-sa() for the 1Password CLI lives in config/zsh/op-sa.zsh)
@@ -127,28 +141,6 @@ install_cask superwhisper "Superwhisper" "superwhisper.app"
 section "Secrets managers"
 install_cask 1password-cli "1Password CLI"
 install_formula openbao "OpenBao"
-
-# ---------------------------------------------------------------------------
-# Fonts
-# ---------------------------------------------------------------------------
-section "Fonts"
-install_cask font-jetbrains-mono-nerd-font "JetBrains Mono Nerd Font"
-note "Ghostty uses it through config/ghostty. In other terminals, select \"JetBrainsMono Nerd Font\" in the font settings."
-
-# ---------------------------------------------------------------------------
-# Starship prompt (needs the Nerd Font above)
-# ---------------------------------------------------------------------------
-section "Starship prompt"
-install_formula starship "Starship"
-
-# ---------------------------------------------------------------------------
-# Neovim + LazyVim (https://www.lazyvim.org). Also uses ripgrep and fd from
-# above (fd is needed to search in the file explorer) and the Nerd Font. The
-# LazyVim config lives in config/nvim.
-# ---------------------------------------------------------------------------
-section "Neovim + LazyVim"
-install_formula neovim "Neovim"
-install_formula tree-sitter-cli "tree-sitter CLI"
 
 # ---------------------------------------------------------------------------
 # Shell config: ~/.zprofile and ~/.zshrc only load the files in config/zsh,
