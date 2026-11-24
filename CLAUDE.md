@@ -21,7 +21,7 @@ Running `install.sh` end to end installs software and rewrites `~/.zprofile`, `~
 ## Architecture
 
 - **`install.sh`** is a flat sequence of `section` blocks. It must keep working when piped from `curl` (no local checkout): it sources `lib.sh` from next to itself if present, otherwise downloads and `eval`s it from GitHub `HEAD`, and clones the repo to `~/.mac-setup` (or `git pull --ff-only` if already cloned) to get `config/`. When run from a checkout, it uses that checkout's `config/` directly.
-- **`lib.sh`** holds every helper. Everything must be idempotent and report via `ok` / `skip` / `note` / `step`:
+- **`lib.sh`** holds every helper. Everything must be idempotent and report via `ok` / `skip` / `note` / `step` (plus `detail` for key/value lines under a message):
   - `install_formula <formula> <name>` / `install_cask <cask> <name> [App.app]` — skip if brew already has it; for casks, pass the `.app` name so apps installed outside Homebrew are skipped instead of making brew fail.
   - `link <src> <dst>` — symlinks a config file; existing real files are moved to `<dst>.bak.<timestamp>`.
   - `source_config <rc> <dir> <rel>` — adds a `source "<repo>/config/<rel>"` line to an rc file and removes lines pointing at the same file in another copy of the repo.
