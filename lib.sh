@@ -151,12 +151,30 @@ install_formula() {
   ok "$name installed"
 }
 
+# use_tap_cask <user/tap/cask>
+# Taps a third-party tap and trusts only the given cask (not the whole tap);
+# Homebrew refuses to load casks from untrusted taps.
+use_tap_cask() {
+  local cask="$1" tap="${1%/*}"
+  if ! brew tap | grep -qxF "$tap"; then
+    step "Tapping $tap..."
+    brew tap "$tap"
+    ok "Tapped $tap"
+  fi
+  if ! brew trust --json v1 | grep -qF "\"$cask\""; then
+    brew trust --cask "$cask"
+    ok "Trusted $cask"
+  fi
+}
+
 # install_cask <cask> <name> [App.app]
+# <cask> can be a third-party cask (user/tap/cask); see use_tap_cask.
 # When an app name is given and that app is already in /Applications but was
 # not installed by Homebrew (e.g. downloaded from the website), the cask is
 # skipped; otherwise brew would fail because the app already exists.
 install_cask() {
   local cask="$1" name="$2" app="${3:-}"
+  case "$cask" in */*/*) use_tap_cask "$cask" ;; esac
   if brew list --cask "$cask" &> /dev/null; then
     skip "$name is already installed"
     return

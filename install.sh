@@ -103,6 +103,7 @@ install_cask ghostty "Ghostty" "Ghostty.app"
 section "Apps"
 install_cask slack "Slack" "Slack.app"
 install_cask obsidian "Obsidian" "Obsidian.app"
+install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
 
 # ---------------------------------------------------------------------------
 # 1Password CLI (op-sa() lives in config/zsh/op-sa.zsh)
