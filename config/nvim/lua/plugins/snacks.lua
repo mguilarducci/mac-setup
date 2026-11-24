@@ -1,4 +1,4 @@
--- Show dotfiles (.gitignore, .claude, ...) by default.
+-- Show dotfiles (.gitignore, .claude, ...) by default, but not the .git folder.
 -- Toggle in the explorer with H (hidden) and I (git-ignored).
 return {
   "folke/snacks.nvim",
@@ -8,6 +8,7 @@ return {
         explorer = {
           hidden = true,
           ignored = true,
+          exclude = { ".git" },
         },
         files = {
           hidden = true,
