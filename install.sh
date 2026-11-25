@@ -108,6 +108,8 @@ section "Dev tools"
 install_formula neovim "Neovim"
 install_formula tree-sitter-cli "tree-sitter CLI"
 install_formula gh "GitHub CLI"
+# mise manages per-project runtimes (Node, Python, ...): https://mise.jdx.dev
+install_formula mise "mise"
 install_formula shellcheck "ShellCheck"
 install_cask docker-desktop "Docker Desktop" "Docker.app"
 note "Open Docker Desktop once to accept the license: open -a Docker"
