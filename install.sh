@@ -129,6 +129,7 @@ install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
 # ---------------------------------------------------------------------------
 section "Productivity"
 install_cask obsidian "Obsidian" "Obsidian.app"
+install_cask linear "Linear" "Linear.app"
 install_cask superwhisper "Superwhisper" "superwhisper.app"
 
 # ---------------------------------------------------------------------------
