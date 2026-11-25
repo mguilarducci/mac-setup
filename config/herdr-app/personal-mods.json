@@ -1,3 +1,16 @@
 {
-  "mods": []
+  "mods": [
+    {
+      "url": "https://github.com/ChmaraX/herdr-nvim/tree/main/herdr-app",
+      "commit": "88a68c77fe82476bdfcba39d36c3fa37109f35a8"
+    },
+    {
+      "url": "https://github.com/munza/herdr-mods/tree/main/better-sidebar",
+      "commit": "bad7512b6148b7092068cd3a6478c45706731c18"
+    },
+    {
+      "url": "https://github.com/munza/herdr-mods/tree/main/branch-pr",
+      "commit": "bad7512b6148b7092068cd3a6478c45706731c18"
+    }
+  ]
 }
