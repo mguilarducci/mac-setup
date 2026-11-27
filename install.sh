@@ -111,6 +111,8 @@ install_formula tree-sitter-cli "tree-sitter CLI"
 install_formula gh "GitHub CLI"
 # mise manages per-project runtimes (Node, Python, ...): https://mise.jdx.dev
 install_formula mise "mise"
+# Global Node.js (and npm); mise overrides it in projects that pin a version.
+install_formula node "Node.js"
 # Rust's cargo builds the crates installed with install_crate.
 install_formula rust "Rust"
 install_formula shellcheck "ShellCheck"
