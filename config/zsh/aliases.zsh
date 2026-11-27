@@ -3,3 +3,6 @@
 # mac-setup: run the latest install.sh from GitHub, same as the README's
 # install command (safe to re-run, it is idempotent).
 alias mac-setup='/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mguilarducci/mac-setup/HEAD/install.sh)"'
+
+# fcs: start the Firecrawl Local server (installed by install_crate).
+alias fcs='"$HOME/.cargo/bin/firecrawl-local" serve'
