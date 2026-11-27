@@ -33,9 +33,9 @@ section() {
 
 step() {
   if $USE_GUM; then
-    echo "  $(gum style --foreground 4 '→') $1"
+    gum style --faint "  → $1"
   else
-    printf '  %s→%s %s\n' "$BLUE" "$RESET" "$1"
+    printf '  %s→ %s%s\n' "$DIM" "$1" "$RESET"
   fi
 }
 
@@ -63,13 +63,13 @@ note() {
   fi
 }
 
-# detail <key> <value>: an indented key/value line (bold key) under the
-# previous message.
+# detail <key> <value>: an indented key/value line under the previous message
+# (all faint, like the other log lines).
 detail() {
   if $USE_GUM; then
-    echo "      $(gum style --bold "$1:") $(gum style --faint "$2")"
+    gum style --faint "      $1: $2"
   else
-    printf '      %s%s:%s %s%s%s\n' "$BOLD" "$1" "$RESET" "$DIM" "$2" "$RESET"
+    printf '      %s%s: %s%s\n' "$DIM" "$1" "$2" "$RESET"
   fi
 }
 
