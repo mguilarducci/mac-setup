@@ -130,6 +130,7 @@ install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
 section "Productivity"
 install_cask obsidian "Obsidian" "Obsidian.app"
 install_cask superwhisper "Superwhisper" "superwhisper.app"
+install_cask zen "Zen Browser" "Zen.app"
 
 # ---------------------------------------------------------------------------
 # Social networking
