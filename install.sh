@@ -145,6 +145,7 @@ install_cask zen "Zen Browser" "Zen.app"
 # ---------------------------------------------------------------------------
 section "Social networking"
 install_cask slack "Slack" "Slack.app"
+install_cask discord "Discord" "Discord.app"
 
 # ---------------------------------------------------------------------------
 # Secrets managers (op-sa() for the 1Password CLI lives in config/zsh/op-sa.zsh)
