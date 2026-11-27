@@ -73,6 +73,21 @@ detail() {
   fi
 }
 
+# confirm <question>: asks yes/no on the terminal (also when piped from curl).
+# Says no when there is no terminal to ask on.
+confirm() {
+  if ! { : < /dev/tty; } 2> /dev/null; then
+    return 1
+  fi
+  if $USE_GUM; then
+    gum confirm --default=false "  $1" < /dev/tty
+  else
+    local answer
+    read -r -p "  ? $1 [y/N] " answer < /dev/tty
+    [[ "$answer" =~ ^[Yy] ]]
+  fi
+}
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -196,6 +211,30 @@ install_formula() {
   step "Installing $name..."
   detail type formula
   brew install "$formula"
+  ok "$name installed"
+}
+
+# install_crate <crate> <name>
+# Builds a crate from crates.io with cargo. brew upgrade doesn't cover crates,
+# so if it is already installed this asks whether to update it.
+install_crate() {
+  local crate="$1" name="$2"
+  if cargo install --list | grep -q "^$crate v"; then
+    if confirm "$name is already installed. Update it?"; then
+      step "Updating $name..."
+      detail type crate
+      # cargo install rebuilds only when crates.io has a newer version.
+      cargo install "$crate"
+      ok "$name is up to date"
+    else
+      skip "$name is already installed"
+      detail type crate
+    fi
+    return
+  fi
+  step "Installing $name..."
+  detail type crate
+  cargo install "$crate"
   ok "$name installed"
 }
 

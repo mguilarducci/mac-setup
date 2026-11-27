@@ -28,9 +28,10 @@ else
   eval "$LIB"
 fi
 
-# Some tools install into ~/.local/bin. config/zsh/zprofile.zsh adds it to the
-# PATH for new shells; this does it for the rest of this run.
-export PATH="$HOME/.local/bin:$PATH"
+# Some tools install into ~/.local/bin, and cargo into ~/.cargo/bin.
+# config/zsh/zprofile.zsh adds them to the PATH for new shells; this does it
+# for the rest of this run.
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 # ---------------------------------------------------------------------------
 # Requirements: Homebrew, git, gum, and this repo (for the files in config/).
@@ -110,6 +111,8 @@ install_formula tree-sitter-cli "tree-sitter CLI"
 install_formula gh "GitHub CLI"
 # mise manages per-project runtimes (Node, Python, ...): https://mise.jdx.dev
 install_formula mise "mise"
+# Rust's cargo builds the crates installed with install_crate.
+install_formula rust "Rust"
 install_formula shellcheck "ShellCheck"
 install_cask docker-desktop "Docker Desktop" "Docker.app"
 note "Open Docker Desktop once to accept the license: open -a Docker"
@@ -123,6 +126,9 @@ install_cask claude-code "Claude Code"
 install_cask codex "Codex"
 install_formula skillshare "Skillshare CLI"
 install_cask runkids/tap/skillshare-app "Skillshare" "skillshare.app"
+# Scrapes, crawls and maps from this Mac: https://github.com/firecrawl/firecrawl#firecrawl-local
+# Not on Homebrew; built with cargo.
+install_crate firecrawl-local "Firecrawl Local"
 
 # ---------------------------------------------------------------------------
 # Productivity
