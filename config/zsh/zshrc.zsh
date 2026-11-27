@@ -4,6 +4,7 @@
 MAC_SETUP_ZSH="${${(%):-%x}:A:h}"
 
 source "$MAC_SETUP_ZSH/op-sa.zsh"
+source "$MAC_SETUP_ZSH/aliases.zsh"
 
 # Starship prompt: https://starship.rs (config: config/starship/starship.toml)
 command -v starship > /dev/null && eval "$(starship init zsh)"
